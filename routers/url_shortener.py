@@ -7,7 +7,8 @@ import string
 from datetime import datetime, timedelta
 
 from database import get_db
-from database import URL
+from database import URL, User
+from utils import hash_password
 
 router = APIRouter()
 
@@ -65,3 +66,23 @@ def redirect_to_original(short_url: str, db: Session = Depends(get_db)):
 def get_all_urls(db:Session = Depends(get_db)):
   urls = db.query(URL).all()
   return urls
+
+class RegisterRequest(BaseModel):
+  name: str
+  email: str
+  password: str
+
+@router.post("/register")
+def register(request: RegisterRequest, db: Session = Depends(get_db)):
+  existing_user = db.query(User).filter(User.email == request.email).first()
+  if existing_user:
+    raise HTTPException(status_code=400, detail="Email is already registered")
+    
+  hashed_password = hash_password(request.password)
+  new_user = User(name=request.name, email=request.email, hashed_password=hashed_password)
+    
+  db.add(new_user)
+  db.commit()
+  db.refresh(new_user)
+
+  return {"message": "Registrasi berhasil"}
