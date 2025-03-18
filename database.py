@@ -10,7 +10,21 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set!")
+
+# Parsing URL dari format mysql:// ke dictionary
+parsed_url = urlparse(DATABASE_URL)
+
+db_config = {
+    "user": parsed_url.username,
+    "password": parsed_url.password,
+    "host": parsed_url.hostname,
+    "port": parsed_url.port,
+    "database": parsed_url.path[1:]  # Hapus "/" di depan nama database
+}
+
+engine = create_engine(**db_config)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
