@@ -1,0 +1,43 @@
+# Virtual environment (jika menggunakan venv)
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor & IDE
+.vscode/
+.idea/
+*.sublime-workspace
+
+# System & OS
+.DS_Store
+Thumbs.db
+
+# Dependency & Package Manager
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Logs & Debugging
+logs/
+*.log
+
+# Environment Variables & Secrets
+.env
+*.env
+secrets.json
+
+# Database (jika menggunakan SQLite)
+*.sqlite3
+*.db
+*.sqlite
+
+# Pytest & Coverage
+.coverage
+htmlcov/
+pytest_cache/
+
+# Render & Deployment
+render.yaml
