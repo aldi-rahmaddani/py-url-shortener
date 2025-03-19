@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import url_shortener
+from app.routers.index import router as all_router
 
 app = FastAPI()
 
@@ -12,4 +12,4 @@ app.add_middleware(
     allow_headers=["*"],  # Izinkan semua header
 )
 
-app.include_router(url_shortener.router)
+app.include_router(all_router)
