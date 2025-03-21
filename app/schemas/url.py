@@ -8,6 +8,7 @@ class URLRequest(BaseModel):
   custom_slug: Optional[str] = None
 
 class URLResponse(BaseModel):
+  id: int
   short_url: str
   original_url: str
   expires_at: datetime

@@ -20,6 +20,7 @@ def generate_short_url():
 def get_list_url(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
   """Mengambil semua URL milik user yang sedang login"""
   urls = db.query(URL).filter(URL.user_id == current_user.id).all()
+  print(urls)
     
   if not urls:
     raise HTTPException(status_code=404, detail="No URLs found for this user")
@@ -44,6 +45,13 @@ def redirect_to_original(short_url: str, db: Session = Depends(get_db)):
 @router.post("/", response_model=URLResponse)
 def shorten_url(request: URLRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
   short_url = ''
+  
+  # Check if the total user URLs have reached the limit
+  limit_urls = current_user.url_limit
+  total_urls = db.query(URL).filter(URL.user_id == current_user.id).count()
+
+  if total_urls >= limit_urls:
+    raise HTTPException(status_code=400, detail="User URL limit reached, please delete some to be able to add more")
 
   # Ensure uniqueness
   if request.custom_slug:
@@ -67,5 +75,20 @@ def shorten_url(request: URLRequest, db: Session = Depends(get_db), current_user
   db.refresh(new_url)
 
   return new_url
+
+@router.delete("/{id_url}", response_model=dict)
+def delete_url(id_url: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+  url_entry = db.query(URL).filter(URL.id == id_url).first()
+
+  if not url_entry:
+    raise HTTPException(status_code=404, detail="URL not found")
+
+  if url_entry.user_id != current_user.id:
+    raise HTTPException(status_code=403, detail="You are not authorized to delete this URL")
+
+  db.delete(url_entry)
+  db.commit()
+
+  return {"status": "OK", "message": "URL deleted successfully"}
 
 
