@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.models.base import Base, get_db 
+from app.config.db import Base, get_db 
 from app.models.user import User
 from app.schemas.user import RegisterRequest
 from app.utils.authentication import hash_password, verify_password, create_access_token
 
 from datetime import timedelta
+import os
 
 router = APIRouter()
 
@@ -26,11 +27,13 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 
   return {"message": "Registration successful"}
 
+token_expires_in_hours = os.getenv("ACCESS_TOKEN_EXPIRE_HOURS")
+
 @router.post("/login")
 def login_user(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
   user = db.query(User).filter(User.email == form_data.username).first()
   if not user or not verify_password(form_data.password, user.hashed_password):
     raise HTTPException(status_code=400, detail="Invalid email or password")
   
-  access_token = create_access_token({"sub": user.email}, timedelta(hours=1))
+  access_token = create_access_token({"sub": user.email}, timedelta(hours=float(token_expires_in_hours)))
   return {"access_token": access_token, "token_type": "bearier"}

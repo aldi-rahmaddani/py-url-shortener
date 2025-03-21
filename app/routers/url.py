@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import random, string
 
-from app.models.base import Base, get_db
+from app.config.db import Base, get_db
 from app.models.url import URL
 from app.models.user import User
 from app.schemas.url import URLRequest, URLResponse

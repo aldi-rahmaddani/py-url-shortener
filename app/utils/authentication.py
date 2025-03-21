@@ -1,28 +1,31 @@
-from passlib.context import CryptContext
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt import PyJWTError
 from sqlalchemy.orm import Session
-from app.models.base import get_db
+from app.config.db import get_db
 from app.models.user import User
 import os
 from datetime import datetime, timedelta
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 def hash_password(password: str) -> str:
-  return pwd_context.hash(password)
+  pwd_bytes = password.encode('utf-8')
+  salt = bcrypt.gensalt()
+  hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+  return hashed_password
 
 def verify_password(plain_password: str, hashed_password: str) -> bool: 
-  return pwd_context.verify(plain_password, hashed_password)
+  password_byte_enc = plain_password.encode('utf-8')
+  hashed_password_byte = hashed_password.encode('utf-8') if isinstance(hashed_password, str) else hashed_password
+  return bcrypt.checkpw(password = password_byte_enc , hashed_password = hashed_password_byte)
 
 # OAuth2 scheme untuk membaca token dari request
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 # Secret key untuk JWT (harus sesuai dengan yang digunakan saat login)
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
+ALGORITHM = os.getenv("ALGORITHM")
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
   """Mendapatkan user yang sedang login berdasarkan token JWT."""
