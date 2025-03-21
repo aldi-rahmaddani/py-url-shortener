@@ -16,10 +16,15 @@ jobs:
 
       - name: Install Environment Secrets
         run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
-          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> $GITHUB_ENV
-          echo "ACCESS_TOKEN_EXPIRE_HOURS=${{ secrets.ACCESS_TOKEN_EXPIRE_HOURS }}" >> $GITHUB_ENV
+          # echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          # echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+          # echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> $GITHUB_ENV
+          # echo "ACCESS_TOKEN_EXPIRE_HOURS=${{ secrets.ACCESS_TOKEN_EXPIRE_HOURS }}" >> $GITHUB_ENV
+
+          echo "DATABASE_URL=mysql+mysqlconnector://sql12768089:SB8i1YrUSj@sql12.freesqldatabase.com/sql12768089" >> $GITHUB_ENV
+          echo "SECRET_KEY=dokumen_rahasia_milik_negara" >> $GITHUB_ENV
+          echo "ALGORITHM=HS256" >> $GITHUB_ENV
+          echo "ACCESS_TOKEN_EXPIRE_HOURS=12" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: |
