@@ -52,28 +52,26 @@ def test_create_short_url():
     response = client.post("/short", json=TEST_URL, headers=headers)
     assert response.status_code == 200
     assert "short_url" in response.json()
-    global short_url
-    short_url = response.json()["short_url"]  # Simpan URL pendek untuk test lain
+    global id_short_url
+    id_short_url = response.json()["id"]  # Simpan URL pendek untuk test lain
 
 def test_get_user_urls():
     """Test mengambil semua URL yang dibuat oleh user yang login."""
+     
     headers = {"Authorization": f"Bearer {access_token}"}
     
     response = client.get("/short/list", headers=headers)
     assert response.status_code == 200
     assert isinstance(response.json(), list)  # Pastikan respons adalah list
 
-# clean up
-def test_cleanup_url():
-  """Hapus short url test dari database setelah pengujian selesai."""
-  db: Session = next(get_db())  # Dapatkan sesi database
-  url = db.query(URL).filter(URL.short_url == short_url).first()
-
-  if url:
-    db.delete(url)
-    db.commit()
-  
-  db.close()
+def test_delete_user_url():
+    """Test menghapus URL pendek yang dibuat oleh user yang login.""" 
+    
+    headers = {"Authorization": f"Bearer {access_token}"}
+    
+    response = client.delete(f"/short/{id_short_url}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["status"] == "OK"
 
 def test_cleanup_user():
   """Hapus user test dari database setelah pengujian selesai."""

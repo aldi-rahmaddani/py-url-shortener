@@ -10,6 +10,7 @@ class URL(Base):
   original_url = Column(String(500), nullable=False)
   short_url = Column(String(20), unique=True, nullable=False)
   click_count = Column(Integer, default=0)
+  password_hash = Column(String(100), nullable=True)
   created_at = Column(DateTime, default=datetime.utcnow)
   expires_at = Column(DateTime)
   user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
